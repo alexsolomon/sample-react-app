@@ -1,0 +1,57 @@
+#leftPane{
+    background-color: #BDD7EE;
+}
+
+#rightPane{
+    background-color: #DEEBF7;
+}
+
+#leftPane .header,#rightPane .header{
+    padding-top: 20px;
+    padding-left: 20px;
+}
+
+#leftPane .questionlist{
+    padding-top: 25px;
+}
+
+#rightPane .questionDetails{
+    padding-top: 25px;
+    padding-left: 20px
+}
+
+.questionDetails input{
+    width: 90%;
+}
+
+.fileUpload{
+    padding-top: 10px;
+}
+
+.questionOptions{
+    padding-top:15px;
+    padding-left: 20px
+}
+
+.questionOptions input{
+    width: 90%;
+}
+
+.options{
+    padding-top:8px;
+}
+
+.buttons{
+    padding-top:15px;
+    padding-left: 20px;
+    padding-bottom: 30px;
+}
+.buttons button{
+    margin-left: 10px;
+    width:100px;
+}
+
+.showleftPane{
+    margin-top:3px;
+}
+
