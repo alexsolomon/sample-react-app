@@ -1,0 +1,158 @@
+class Root extends React.Component {
+  constructor(props) {
+        super(props);
+        this.state={
+        questionList:[],
+        selectedQuestion: null
+        }
+        let questionList = [
+        {
+        Id : 1,
+        Question:"What is the capital of India?",
+        Options:[
+                {
+                Id:1,
+                Value : "Delhi"
+                },
+                {
+                Id:2,
+                Value : "Calcutta"
+                }
+                ],
+        Selected:true
+        }];
+        
+        questionList = questionList.concat({
+            Id: 2,
+            Question: "What is the capital of USA?",
+             Options:[
+                {
+                Id:1,
+                Value : "Washington"
+                }
+                ],
+            Selected:false
+        });
+        this.state.questionList = questionList;
+        this.state.selectedQuestion= questionList[0];
+    }
+    
+    selectQuestion(questionItem,e) {
+     
+      
+      const stateQuestionList = this.state.questionList.slice();
+       this.findAndReplace(stateQuestionList,questionItem.Id);
+       this.setState({questionList: stateQuestionList});
+     
+    }
+    
+ findAndReplace(list,keyvalue) {
+   for (var i = 0; i < list.length; i++) {
+    if(list[i].Id == keyvalue){
+    
+    list[i].Selected = true;
+    this.setState({selectedQuestion: list[i]});
+    }
+    else{
+    list[i].Selected = false;
+    }
+  }
+}
+    
+    render() {
+        return <div className="row" >
+            <div id="leftPane"
+                className="col-sm-3 " >
+                <div className="header">
+                    <b>Select your questions</b>
+                </div>
+
+                <div className="questionlist">
+                    <ol>
+                    {
+                     
+                    this.state.questionList.map((item, index) =>{
+                    return <li ><span className={item.Selected ? 'selectedQuestion' : ''} onClick={(e) => this.selectQuestion(item, e)} >{item.Question}</span></li>
+                    })
+                    }   
+                    </ol>
+
+                </div>
+
+                <div className="buttons">
+                    <div className="row">
+                        <div className="col-12 text-center">
+                            <button className="btn btn-primary">Add</button>
+                            <button className="btn btn-primary">Delete</button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div >
+            <div id="rightPane" className="col-xs-12 col-sm-9" >
+                <div className="showleftPane visible-xs">
+                    <span className="fa fa-caret-square-o-right"></span>
+                </div>
+                <div className="header">
+                    <b>Design Question 1</b>
+                </div>
+                
+                <div className="questionDetails">
+                    <div className="row">
+                        <div className="col-sm-2">
+                            <label >Question</label>
+                        </div>
+                        <div className="col-sm-10">
+                            <input type="text" value={this.state.selectedQuestion.Question}></input>
+                        </div>
+
+                    </div>
+                    <div className="row fileUpload">
+                        <div className="col-12 text-center">
+                            <label className="btn btn-primary btn-file">Add Image</label>
+                        </div>
+                    </div>
+
+                </div>
+                <div className="questionOptions">
+                    <div className="row">
+                        <div className="col-sm-2">
+                            <label >Option 1</label>
+                        </div>
+                        <div className="col-sm-10">
+                            <input type="text"></input>
+                        </div>
+
+                    </div>
+                    <div className="row options">
+                        <div className="col-sm-2">
+                            <label >Option 2</label>
+                        </div>
+                        <div className="col-sm-10">
+                            <input type="text"></input>
+                        </div>
+
+                    </div>
+                </div>
+                <div className="buttons">
+                    <div className="row">
+                        <div className="col-12 text-center">
+                            <button className="btn btn-primary">Add</button>
+                            <button className="btn btn-primary">Delete</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div >
+        </div>;
+    }
+};
+
+class App extends React.Component {
+  render() {
+      return <Root /> ;
+  }
+};
+ 
+React.render(<App />, document.getElementById("root"));
