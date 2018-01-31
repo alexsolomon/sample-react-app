@@ -1,90 +1,162 @@
 import React, { Component } from 'react';
+import QuestionList from "./questionListComponent";
+import QuestionDesign from "./questionDesignComponent.js";
+import QuestionHelper from "./questionHelper";
 
 class Root extends Component {
+    constructor(props) {
+        super(props);
+        this.state = QuestionHelper.getAll();
+    }
+
     render() {
         return <div className="row" >
-            <div id="leftPane"
-                className="col-sm-3 d-none d-sm-block" >
-                <div className="header">
-                    <b>Select your questions</b>
-                </div>
-
-                <div className="questionlist">
-                    <ol>
-                        <li>What is the capital of India?</li>
-                        <li>What is the capital of USA?</li>
-                        <li>What is the capital of UK?</li>
-                    </ol>
-
-                </div>
-
-                <div className="buttons">
-                    <div className="row">
-                        <div className="col-12 text-center">
-                            <button className="btn btn-primary">Add</button>
-                            <button className="btn btn-primary">Delete</button>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div >
-            <div id="rightPane" className="col-xs-12 col-sm-9" >
-                <div className="showleftPane d-block d-sm-none">
-                    <span className="fa fa-caret-square-o-right"></span>
-                </div>
-                <div className="header">
-                    <b>Design Question 1</b>
-                </div>
-
-                <div className="questionDetails">
-                    <div className="row">
-                        <div className="col-sm-2">
-                            <label >Question</label>
-                        </div>
-                        <div className="col-sm-10">
-                            <input type="text"></input>
-                        </div>
-
-                    </div>
-                    <div className="row fileUpload">
-                        <div className="col-12 text-center">
-                            <label className="btn btn-primary btn-file">Add Image</label>
-                        </div>
-                    </div>
-
-                </div>
-                <div className="questionOptions">
-                    <div className="row">
-                        <div className="col-sm-2">
-                            <label >Option 1</label>
-                        </div>
-                        <div className="col-sm-10">
-                            <input type="text"></input>
-                        </div>
-
-                    </div>
-                    <div className="row options">
-                        <div className="col-sm-2">
-                            <label >Option 2</label>
-                        </div>
-                        <div className="col-sm-10">
-                            <input type="text"></input>
-                        </div>
-
-                    </div>
-                </div>
-                <div className="buttons">
-                    <div className="row">
-                        <div className="col-12 text-center">
-                            <button className="btn btn-primary">Add</button>
-                            <button className="btn btn-primary">Delete</button>
-                        </div>
-                    </div>
-
-                </div>
-            </div >
+            <QuestionList rootComponent = {this} state = { this.state } 
+            addQuestion = { this.addQuestion } />
+            <QuestionDesign rootComponent = {this} state = { this.state } />
         </div>;
+    }
+
+    addQuestion(){
+        let list = this.state.questionList.slice();
+        let length = list.length + 1;
+        list = list.concat({
+            Id: length,
+            Question: "New Question " + length + " ?",
+            Options: [{ Id: 1, Value: "" }, { Id: 2, Value: "" }]
+        });
+
+        let currentState = {
+            questionList: list,
+            currentIndex: length - 1
+        }
+
+        this.setState(currentState);
+    }
+
+    selectQuestion(index){
+        this.setState({currentIndex: index});
+        this.setState({questionDeleteMode: false});
+        this.setState({optionDeleteMode: false});
+    }
+
+    updateQuestion(e) {
+        let list = this.state.questionList.slice();
+        let index = this.state.currentIndex;
+        list[index].Question = e.target.value;
+       
+        this.setState({questionList: list});
+        //QuestionList.updateList(currentState);
+    }
+
+    addNewOption() {
+        let list = this.state.questionList.slice();
+        let currentList = list[this.state.currentIndex];
+        currentList.Options.push({ Id: currentList.Options.length + 1, Value: "" });
+        
+        this.setState({questionList: list});
+        //QuestionList.updateList(currentState);
+    }
+
+    updateOption(optionIndex, e) {
+        let list = this.state.questionList.slice();
+        let currentList = list[this.state.currentIndex]; 
+        currentList.Options[optionIndex].Value = e.target.value;
+       
+        this.setState({questionList: list});
+        //QuestionList.updateList(currentState);
+    }
+
+    showLeftPaneForMobile(){
+        this.setState({showLeftPaneForMobile: true});
+    }
+
+    showRightPaneForMobile(){
+        this.setState({showLeftPaneForMobile: false});
+    }
+
+    enableDeleteQuestion(){
+        this.setState({questionDeleteMode: true});
+    }
+
+    deleteQuestion(index){
+        let list = this.state.questionList.slice();
+        let currentIndex = this.state.currentIndex;
+        list.splice(index, 1);
+        this.setState({currentIndex: currentIndex == 0 ? 0 : currentIndex-1});
+        this.setState({questionList: list});
+    }
+
+    enableDeleteOption(){
+        this.setState({optionDeleteMode: true});
+    }
+
+    deleteOption(index){
+        let list = this.state.questionList.slice();
+        let currentList = list[this.state.currentIndex]; 
+        currentList.Options.splice(index, 1);
+        this.setState({questionList: list});
+    }
+
+    enableImageUpload(){
+        let fileUploadState = this.state.fileUploadState;
+        fileUploadState = fileUploadState ? fileUploadState + 1 : 1;
+        this.setState({enableImageUpload: true});
+        this.setState({fileUploadState: fileUploadState});
+    }
+
+    uploadFile(e) {
+        let list = this.state.questionList;
+        let index = this.state.currentIndex;
+
+        let img = new Image();
+        let reader = new FileReader();
+        reader.onload = (e) => {
+            img.onload = (e) => {
+                let canvas = document.createElement('canvas');
+                let maxHeight = 1280;
+                let maxWidth = 960;
+                let actualHeight = img.height;
+                let actualWidth = img.width;
+                let imgRatio = actualWidth / actualHeight;
+                let maxRatio = maxWidth / maxHeight;
+                if (actualHeight > maxHeight || actualWidth > maxWidth) {
+                    if (imgRatio < maxRatio) {
+                        imgRatio = maxHeight / actualHeight;
+                        actualWidth = imgRatio * actualWidth;
+                        actualHeight = maxHeight;
+                    }
+                    else if (imgRatio > maxRatio) {
+                        imgRatio = maxWidth / actualWidth;
+                        actualHeight = imgRatio * actualHeight;
+                        actualWidth = maxWidth;
+                    } else {
+                        actualHeight = maxHeight;
+                        actualWidth = maxWidth;
+                    }
+                }
+                canvas.width = actualWidth;
+                canvas.height = actualHeight;
+                let ctx = canvas.getContext("2d").drawImage(img, 0, 0, actualWidth, actualHeight);
+                list[index].Image = canvas.toDataURL("image/png");
+                
+                this.setState({questionList: list});
+            }
+            img.src = e.target.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    deleteImage(){
+        let list = this.state.questionList.slice();
+        let index = this.state.currentIndex;
+        list[index].Image = null;
+       
+        this.setState({questionList: list});
+
+        let fileUploadState = this.state.fileUploadState;
+        fileUploadState = fileUploadState ? fileUploadState + 1 : 1;
+        this.setState({fileUploadState: fileUploadState});
     }
 };
 
